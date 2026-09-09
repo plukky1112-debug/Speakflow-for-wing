@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F172A">
+<title>SpeakFlow AI</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --ind:#4F46E5;--vio:#8B5CF6;--cy:#06B6D4;--em:#10B981;--am:#F59E0B;--ro:#F43F5E;
+  --bg:#0F172A;--sur:#1E293B;--bd:#334155;--mut:#64748B;--tx:#F8FAFC;
+}
+body{
+  font-family:'IBM Plex Sans Thai','Inter',-apple-system,system-ui,sans-serif;
+  background:var(--bg);color:var(--tx);min-height:100dvh;
+  display:flex;flex-direction:column;max-width:640px;margin:0 auto;
+  -webkit-font-smoothing:antialiased;overscroll-behavior:none;
+}
+header{
+  position:sticky;top:0;z-index:20;background:rgba(15,23,42,.9);
+  backdrop-filter:blur(16px);border-bottom:1px solid var(--bd);
+  padding:calc(env(safe-area-inset-top) + 10px) 14px 8px;
+}
+.row{display:flex;align-items:center;gap:10px}
+.logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--ind),var(--vio));
+  display:grid;place-items:center;font-size:17px;flex-shrink:0}
+h1{font-size:14px;font-weight:600}
+.sub{font-size:11px;color:var(--mut)}
+.ib{background:none;border:none;color:var(--tx);font-size:18px;padding:6px;border-radius:8px;cursor:pointer}
+.streak{background:rgba(245,158,11,.15);color:var(--am);font-size:12px;font-weight:600;
+  padding:4px 10px;border-radius:99px;white-space:nowrap}
+.scroll{display:flex;gap:7px;overflow-x:auto;padding:9px 0 3px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;border:none;border-radius:99px;padding:7px 14px;font-size:12px;font-weight:500;
+  background:var(--sur);color:#94A3B8;cursor:pointer;font-family:inherit}
+.tab.on{background:linear-gradient(90deg,var(--ind),var(--vio));color:#fff}
+.chip{flex-shrink:0;border:1px solid var(--bd);background:none;border-radius:9px;
+  padding:5px 10px;font-size:11px;color:var(--mut);cursor:pointer;font-family:inherit}
+.chip.on{border-color:var(--cy);background:rgba(6,182,212,.1);color:var(--cy)}
+main{flex:1;padding:16px 14px 8px;display:flex;flex-direction:column;gap:14px}
+.rise{animation:r .35s ease-out both}
+@keyframes r{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.hero{text-align:center;margin-top:36px}
+.hero .big{width:78px;height:78px;margin:0 auto;border-radius:24px;font-size:34px;
+  background:linear-gradient(135deg,var(--ind),var(--vio));display:grid;place-items:center;
+  box-shadow:0 0 60px -14px var(--ind)}
+.hero h2{margin-top:18px;font-size:18px;font-weight:600}
+.hero p{margin-top:6px;font-size:13px;color:var(--mut)}
+.cta{margin-top:22px;border:none;border-radius:99px;padding:13px 30px;font-size:14px;font-weight:600;
+  color:#fff;background:linear-gradient(90deg,var(--ind),var(--vio));cursor:pointer;
+  box-shadow:0 0 40px -12px var(--ind);font-family:inherit}
+.ai{display:flex;gap:9px}
+.av{width:27px;height:27px;border-radius:8px;flex-shrink:0;margin-top:3px;font-size:10px;
+  background:linear-gradient(135deg,var(--ind),var(--vio));display:grid;place-items:center;font-weight:600}
+.bub{max-width:86%;border:1px solid var(--bd);background:var(--sur);
+  border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:15px;line-height:1.6}
+.me{align-self:flex-end;max-width:86%;border-radius:16px 16px 4px 16px;padding:12px 14px;
+  font-size:15px;line-height:1.6;background:linear-gradient(135deg,var(--ind),#6D5AE8)}
+.th{margin-top:8px;padding-top:8px;border-top:1px solid var(--bd);font-size:13px;color:#94A3B8}
+.tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tool{border:1px solid var(--bd);background:none;border-radius:8px;padding:4px 8px;
+  font-size:11px;color:#94A3B8;cursor:pointer;font-family:inherit}
+.tool:active{border-color:var(--ind);color:#fff}
+.hint{margin-top:8px;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.1);
+  border-radius:12px;padding:11px;font-size:13px;color:#FCD34D;line-height:1.7}
+.fb{margin-top:9px;border:1px solid var(--bd);background:rgba(30,41,59,.6);border-radius:16px;padding:14px}
+.ring{width:42px;height:42px;border-radius:50%;border:2px solid;display:grid;place-items:center;
+  font-size:14px;font-weight:700;flex-shrink:0}
+.good{color:var(--em);font-size:13px;margin-top:11px;line-height:1.6}
+.bad{color:var(--am);font-size:13px;margin-top:5px;line-height:1.6}
+.more{margin-top:11px;background:none;border:none;color:var(--vio);font-size:12px;
+  font-weight:500;cursor:pointer;font-family:inherit;padding:0}
+.det{margin-top:14px;padding-top:14px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:10px}
+.ver{background:var(--bg);border-left:2px solid;border-radius:11px;padding:11px}
+.vh{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.vl{font-size:10px;font-weight:700;letter-spacing:.5px}
+.vt{font-size:13.5px;line-height:1.65}
+.note{background:var(--bg);border-radius:11px;padding:11px}
+.nl{font-size:10px;font-weight:700;color:var(--mut);margin-bottom:4px;letter-spacing:.5px}
+.nt{font-size:13px;color:#CBD5E1;line-height:1.65}
+.chal{border:1px solid rgba(79,70,229,.4);background:rgba(79,70,229,.1);border-radius:11px;padding:11px}
+.live{align-self:flex-end;max-width:86%;border:1px dashed rgba(244,63,94,.5);
+  background:rgba(244,63,94,.1);border-radius:16px 16px 4px 16px;padding:12px 14px;
+  font-size:15px;color:#FDA4AF;line-height:1.6}
+footer{position:sticky;bottom:0;background:rgba(15,23,42,.92);backdrop-filter:blur(16px);
+  border-top:1px solid var(--bd);padding:14px 14px calc(env(safe-area-inset-bottom) + 14px)}
+.dock{display:flex;align-items:center;justify-content:center;gap:26px}
+.mini{width:44px;height:44px;border-radius:50%;border:1px solid var(--bd);background:none;
+  color:var(--mut);font-size:17px;cursor:pointer}
+.mic{width:78px;height:78px;border-radius:50%;border:none;color:#fff;font-size:31px;cursor:pointer;
+  background:linear-gradient(135deg,var(--ind),var(--vio));box-shadow:0 0 45px -10px var(--ind);
+  transition:.2s;display:grid;place-items:center}
+.mic:disabled{opacity:.35}
+.mic.rec{background:var(--ro);box-shadow:none;animation:p 1.6s ease-out infinite}
+@keyframes p{0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,.5)}50%{box-shadow:0 0 0 22px rgba(244,63,94,0)}}
+.stat{text-align:center;font-size:12px;color:var(--mut);margin-top:11px}
+.typebar{display:flex;gap:8px}
+.typebar input{flex:1;border:1px solid var(--bd);background:var(--sur);color:var(--tx);
+  border-radius:12px;padding:12px 14px;font-size:16px;font-family:inherit;outline:none}
+.typebar input:focus{border-color:var(--ind)}
+.sbtn{border:none;background:var(--ind);color:#fff;border-radius:12px;padding:0 16px;font-size:17px;cursor:pointer}
+.ov{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);
+  display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:560px;max-height:88dvh;overflow-y:auto;background:var(--bg);
+  border:1px solid var(--bd);border-radius:26px 26px 0 0;padding:20px 18px calc(env(safe-area-inset-bottom) + 20px)}
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.sh h3{font-size:16px;font-weight:600}
+label{display:block;font-size:12px;color:var(--mut);margin-bottom:6px;margin-top:14px}
+select,.inp{width:100%;border:1px solid var(--bd);background:var(--sur);color:var(--tx);
+  border-radius:12px;padding:11px 13px;font-size:16px;font-family:inherit;outline:none}
+.save{width:100%;margin-top:22px;border:none;border-radius:12px;padding:13px;font-size:14px;
+  font-weight:600;color:#fff;background:linear-gradient(90deg,var(--ind),var(--vio));cursor:pointer;font-family:inherit}
+.item{border:1px solid var(--bd);background:var(--sur);border-radius:12px;padding:12px;margin-bottom:9px}
+.tag{background:rgba(79,70,229,.2);color:#A5B4FC;font-size:10px;padding:2px 8px;border-radius:5px}
+.empty{text-align:center;padding:44px 0;font-size:13px;color:var(--mut);line-height:1.9}
+.warn{background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.35);color:#FDA4AF;
+  border-radius:12px;padding:12px;font-size:12.5px;line-height:1.7;margin-bottom:6px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="row">
+    <div class="logo">✨</div>
+    <div style="flex:1">
+      <h1>SpeakFlow AI</h1>
+      <div class="sub" id="greet">สวัสดี 👋 พร้อมฝึกวันนี้ไหม?</div>
+    </div>
+    <span class="streak" id="streak">🔥 0</span>
+    <button class="ib" onclick="openBook()">📚</button>
+    <button class="ib" onclick="openSet()">⚙️</button>
+  </div>
+  <div class="scroll" id="mods"></div>
+  <div class="scroll" id="tops"></div>
+</header>
+
+<main id="chat"></main>
+
+<footer>
+  <div id="dock" class="dock">
+    <button class="mini" onclick="reset()">↺</button>
+    <button class="mic" id="mic" onclick="toggleMic()" disabled>🎤</button>
+    <button class="mini" onclick="showType()">⌨️</button>
+  </div>
+  <div id="typebar" class="typebar" style="display:none">
+    <input id="tin" placeholder="พิมพ์คำตอบภาษาอังกฤษ..." autocomplete="off">
+    <button class="sbtn" onclick="sendTyped()">➤</button>
+    <button class="sbtn" style="background:var(--sur)" onclick="hideType()">✕</button>
+  </div>
+  <div class="stat" id="stat">กด "เริ่มบทเรียน" ก่อน</div>
+</footer>
+
+<script>
+/* ================= DATA ================= */
+const MODULES=[
+ {k:"daily",n:"คุยทั่วไป",e:"💬",t:["Introducing Yourself","Small Talk","Making Friends","Ordering Food","Shopping","Hotel Check-in","Airport & Travel","Asking for Directions","Talking About Work","Phone Calls","Giving Opinions"]},
+ {k:"cabincrew",n:"สัมภาษณ์ลูกเรือ",e:"✈️",t:["Self Introduction","Why Cabin Crew?","Why This Airline?","Customer Service","Difficult Passenger","Teamwork","Stress Management","Safety First","Strengths & Weaknesses","Full Mock Interview"]},
+ {k:"describe",n:"Describe It!",e:"🎯",t:["Everyday Objects","Travel","Food","Jobs","Customer Service","Cabin Crew","Random Challenge"]},
+ {k:"story",n:"เล่าเรื่อง",e:"📖",t:["Tell me about your day","A personal experience","A challenge I overcame","Random prompt"]},
+ {k:"shadow",n:"ออกเสียง",e:"🗣️",t:["Service Phrases","Safety Announcements","Everyday Sentences","Linking Sounds","Word Stress"]},
+ {k:"vocab",n:"คำศัพท์สู่การพูด",e:"⭐",t:["Service Vocabulary","Travel Vocabulary","Workplace Vocabulary","Emotion Words","Advanced Verbs"]}
+];
+const MP={
+ daily:`DAILY CONVERSATION practice. Play a natural everyday character in the scenario. Ask ONE question at a time then wait. Under 40 words. Warm and encouraging.`,
+ cabincrew:`You are a professional CABIN CREW INTERVIEWER for the learner's target airline. Ask ONE interview question at a time, polite and professional. Use STAR guidance for behavioral questions. NEVER invent fake experience — if they have none, help them draw from real study, part-time jobs, volunteering or daily life. In "professional" always weave in service mindset and safety awareness.`,
+ describe:`DESCRIBE IT! game. Give a target word; the learner describes it WITHOUT saying it. Judge clarity, vocabulary, fluency, naturalness. In detail give Simple / Natural / Advanced model descriptions.`,
+ story:`STORYTELLING practice. Guide through 6 beats: Opening → Context → Problem → Action → Result → Reflection. Say which beat they're on. Improve flow WITHOUT changing their real experience.`,
+ shadow:`PRONUNCIATION & SHADOWING. Give one sentence to shadow split by "/" with STRESSED words in CAPS, e.g. "I'd LIKE to make SURE / that every PASSENGER / feels COMFORTABLE." Feedback on clarity, linking, rhythm, stress. NEVER judge the learner's accent.`,
+ vocab:`VOCABULARY TO SPEAKING. Give ONE useful word with collocation + example, then challenge them to say their own sentence out loud.`
+};
+const AIRLINES=["Emirates","Qatar Airways","Singapore Airlines","Thai Airways","AirAsia","Cathay Pacific","ANA","Other"];
+const LEVELS=["Beginner","Elementary","Intermediate","Upper-Intermediate","Advanced"];
+const CORR=["แก้ทันที","แก้หลังตอบจบ","แก้เฉพาะจุดใหญ่","เน้นภาษาธรรมชาติ","เน้นภาษามืออาชีพ"];
+const DEF={key:"",provider:"gemini",name:"",level:"Intermediate",goal:"Cabin Crew Interview",airline:"Emirates",correction:"แก้หลังตอบจบ",accent:"american"};
+
+/* ================= STATE ================= */
+const L=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
+const S=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+let cfg=Object.assign({},DEF,L("sf-set",{}));
+let book=L("sf-book",[]);
+let mod="daily",topic=MODULES[0].t[0],msgs=[],status="idle",rec=null,ttsReady=false;
+
+/* ================= INIT ================= */
+(function(){
+  const today=new Date().toDateString(), s=L("sf-streak",{last:"",n:0});
+  let n=s.n;
+  if(s.last!==today){const y=new Date(Date.now()-864e5).toDateString();n=(s.last===y?s.n+1:1);S("sf-streak",{last:today,n});}
+  document.getElementById("streak").textContent="🔥 "+n;
+  document.getElementById("greet").textContent="สวัสดี "+(cfg.name||"")+" 👋 พร้อมฝึกวันนี้ไหม?";
+  renderTabs();renderChat();
+  if(!cfg.key) setTimeout(openSet,400);
+  document.getElementById("tin").addEventListener("keydown",e=>{if(e.key==="Enter")sendTyped()});
+})();
+
+function renderTabs(){
+  document.getElementById("mods").innerHTML=MODULES.map(m=>
+    `<button class="tab${m.k===mod?" on":""}" onclick="setMod('${m.k}')">${m.e} ${m.n}</button>`).join("");
+  const M=MODULES.find(m=>m.k===mod);
+  document.getElementById("tops").innerHTML=M.t.map(t=>
+    `<button class="chip${t===topic?" on":""}" onclick="setTop('${t.replace(/'/g,"\\'")}')">${t}</button>`).join("");
+}
+function setMod(k){mod=k;topic=MODULES.find(m=>m.k===k).t[0];msgs=[];renderTabs();renderChat()}
+function setTop(t){topic=t;msgs=[];renderTabs();renderChat()}
+function reset(){msgs=[];renderChat()}
+
+/* ================= SPEECH ================= */
+function unlockTTS(){
+  if(ttsReady)return;
+  const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u);ttsReady=true;
+}
+function speak(t,rate){
+  unlockTTS();
+  const u=new SpeechSynthesisUtterance(String(t).replace(/\//g,","));
+  u.lang=cfg.accent==="british"?"en-GB":"en-US";u.rate=rate||1;
+  speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(u),60);
+}
+function toggleMic(){
+  unlockTTS();
+  if(status==="rec"){try{rec.stop()}catch(e){};return}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert("อุปกรณ์นี้ไม่รองรับการฟังเสียง\n\niPhone/iPad: ตั้งค่า > ทั่วไป > แป้นพิมพ์ > เปิด 'การบอกคำบอก'\nแล้วใช้ Safari\n\nหรือกดปุ่ม ⌨️ พิมพ์ตอบแทนได้");return}
+  const r=new SR();
+  r.lang=cfg.accent==="british"?"en-GB":"en-US";
+  r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
+  let fin="";
+  r.onresult=e=>{let it="";for(let i=e.resultIndex;i<e.results.length;i++){
+    e.results[i].isFinal?fin+=e.results[i][0].transcript+" ":it+=e.results[i][0].transcript}
+    setLive((fin+it).trim())};
+  r.onend=()=>{setStatus("idle");const t=fin.trim();setLive("");if(t)send(t)};
+  r.onerror=ev=>{setStatus("idle");setLive("");
+    if(ev.error==="not-allowed")alert("กรุณาอนุญาตให้ใช้ไมโครโฟน\n(ตั้งค่า Safari > ไมโครโฟน > อนุญาต)")};
+  rec=r;setLive("");setStatus("rec");
+  try{r.start()}catch(e){setStatus("idle")}
+}
+
+/* ================= AI ================= */
+function sysPrompt(){
+ return `You are "SpeakFlow AI", a premium English speaking coach for Thai learners.
+Learner: name=${cfg.name||"learner"}, level=${cfg.level}, goal=${cfg.goal}, target airline=${cfg.airline}, correction style=${cfg.correction}.
+${MP[mod]}
+Current topic/scenario: "${topic}".
+RULES: The learner must speak MORE than you — keep replies short. Always positive first, then ONE improvement. Never shame mistakes. English in "reply"; Thai in "th","strength","improvement","grammarNote","pronunciationTip","challenge". If they write Thai, gently guide them back to English. Start easy, raise difficulty gradually.
+Return ONLY valid JSON:
+{"reply":"your English line / next question","th":"คำแปลไทย","hints":["starter 1","starter 2","starter 3"],
+"feedback":null or {"headline":"Great job! | Nice progress! | Let's improve this slightly","score":1-10,
+"strength":"จุดแข็ง 1 ข้อ","improvement":"จุดที่ควรปรับ 1 ข้อ","corrected":"grammar-corrected version",
+"natural":"natural native-like version","professional":"polished professional version",
+"grammarNote":"โน้ตแกรมมาร์สั้นๆ","pronunciationTip":"ทิปการออกเสียง",
+"vocab":["word — ความหมายไทย","word — ความหมายไทย"],"challenge":"ชาเลนจ์ให้ลองตอบใหม่"}}
+"feedback" is null ONLY on the very first message. After that always fill it.`;
+}
+async function callAI(history){
+  if(cfg.provider==="groq"){
+    const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+cfg.key},
+      body:JSON.stringify({model:"llama-3.3-70b-versatile",temperature:.7,
+        response_format:{type:"json_object"},
+        messages:[{role:"system",content:sysPrompt()}].concat(
+          history.map(m=>({role:m.role==="coach"?"assistant":"user",content:m.text})))})});
+    if(!r.ok)throw new Error(await r.text());
+    return JSON.parse((await r.json()).choices[0].message.content);
+  }
+  const url="https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key="+cfg.key;
+  const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      system_instruction:{parts:[{text:sysPrompt()}]},
+      contents:history.map(m=>({role:m.role==="coach"?"model":"user",parts:[{text:m.text}]})),
+      generationConfig:{temperature:.7,responseMimeType:"application/json"}})});
+  if(!r.ok)throw new Error(await r.text());
+  const d=await r.json();
+  return JSON.parse(d.candidates[0].content.parts[0].text);
+}
+async function send(text){
+  if(!text||!text.trim())return;
+  if(!cfg.key){openSet();return}
+  msgs.push({role:"user",text:text});
+  setStatus("proc");renderChat();
+  try{
+    const d=await callAI(msgs);
+    msgs.push({role:"coach",text:d.reply,th:d.th,hints:d.hints||[],fb:d.feedback||null});
+    renderChat();speak(d.reply,1);
+  }catch(e){
+    msgs.push({role:"coach",text:"⚠️ เชื่อมต่อ AI ไม่สำเร็จ",th:"ตรวจสอบ API Key ในหน้าตั้งค่า ⚙️",hints:[],fb:null});
+    renderChat();
+  }
+  setStatus("idle");
+}
+function start(){unlockTTS();send("__START__")}
+function sendTyped(){const i=document.getElementById("tin");const v=i.value;i.value="";hideType();send(v)}
+function showType(){document.getElementById("dock").style.display="none";
+  document.getElementById("typebar").style.display="flex";document.getElementById("tin").focus()}
+function hideType(){document.getElementById("typebar").style.display="none";
+  document.getElementById("dock").style.display="flex"}
+
+/* ================= RENDER ================= */
+function setStatus(s){
+  status=s;const m=document.getElementById("mic"),st=document.getElementById("stat");
+  m.className="mic"+(s==="rec"?" rec":"");
+  m.textContent=s==="rec"?"⏹":s==="proc"?"⏳":"🎤";
+  m.disabled=(s==="proc"||msgs.length===0);
+  st.textContent=s==="rec"?"🔴 กำลังฟังอยู่... แตะเพื่อหยุด":
+    s==="proc"?"AI กำลังวิเคราะห์คำตอบของคุณ...":
+    msgs.length===0?'กด "เริ่มบทเรียน" ก่อน':"แตะไมค์เพื่อพูดตอบ";
+}
+let liveTxt="";
+function setLive(t){liveTxt=t;renderChat()}
+const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+function renderChat(){
+  const c=document.getElementById("chat");const M=MODULES.find(m=>m.k===mod);
+  let h="";
+  if(msgs.length===0){
+    h+=`<div class="hero rise"><div class="big">${M.e}</div>
+      <h2>${esc(topic)}</h2>
+      <p>${M.n} · ระดับ ${esc(cfg.level)}${mod==="cabincrew"?" · "+esc(cfg.airline):""}</p>
+      <button class="cta" onclick="start()">เริ่มบทเรียน</button></div>`;
+  }
+  msgs.forEach((m,i)=>{
+    if(m.text==="__START__")return;
+    if(m.role==="user"){h+=`<div class="me rise">${esc(m.text)}</div>`;return}
+    h+=`<div class="ai rise"><div class="av">AI</div><div style="flex:1;min-width:0">
+      <div class="bub">${esc(m.text)}<div class="th" id="th${i}" style="display:none">${esc(m.th)}</div></div>
+      <div class="tools">
+        <button class="tool" onclick="speak(msgs[${i}].text,1)">🔊 ฟัง</button>
+        <button class="tool" onclick="speak(msgs[${i}].text,.6)">🐢 ช้าลง</button>
+        <button class="tool" onclick="tog('th${i}')">🌐 แปล</button>
+        ${m.hints&&m.hints.length?`<button class="tool" onclick="tog('hi${i}')">💡 คำใบ้</button>`:""}
+        <button class="tool" onclick="bm(${i})">📌 บันทึก</button>
+      </div>
+      ${m.hints&&m.hints.length?`<div class="hint" id="hi${i}" style="display:none">${m.hints.map(x=>"💡 "+esc(x)).join("<br>")}</div>`:""}
+      ${m.fb?fbHTML(m.fb,i):""}
+    </div></div>`;
+  });
+  if(liveTxt)h+=`<div class="live">${esc(liveTxt)}</div>`;
+  if(status==="proc")h+=`<div style="font-size:13px;color:var(--mut)">⏳ AI กำลังวิเคราะห์คำตอบของคุณ...</div>`;
+  c.innerHTML=h;
+  setStatus(status);
+  window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+}
+function fbHTML(f,i){
+  const col=f.score>=8?"#10B981":f.score>=6?"#06B6D4":"#F59E0B";
+  const V=(l,c,t)=>`<div class="ver" style="border-color:${c}">
+    <div class="vh"><span class="vl" style="color:${c}">${l}</span>
+      <span><button class="tool" onclick="speak(this.parentNode.parentNode.nextElementSibling.textContent,1)">🔊</button>
+      <button class="tool" onclick="bmText(this.parentNode.parentNode.nextElementSibling.textContent)">📌</button></span></div>
+    <div class="vt">${esc(t)}</div></div>`;
+  return `<div class="fb">
+   <div class="row"><div class="ring" style="border-color:${col};color:${col}">${f.score}</div>
+     <div style="font-size:14px;font-weight:600;color:${col}">${esc(f.headline)}</div></div>
+   <div class="good">✓ ${esc(f.strength)}</div>
+   <div class="bad">→ ${esc(f.improvement)}</div>
+   <button class="more" onclick="tog('dt${i}',this)">ดู Feedback แบบละเอียด ▼</button>
+   <div class="det" id="dt${i}" style="display:none">
+     ${V("CORRECTED","#F59E0B",f.corrected)}
+     ${V("NATURAL","#06B6D4",f.natural)}
+     ${V("PROFESSIONAL","#8B5CF6",f.professional)}
+     ${f.grammarNote?`<div class="note"><div class="nl">📘 GRAMMAR</div><div class="nt">${esc(f.grammarNote)}</div></div>`:""}
+     ${f.pronunciationTip?`<div class="note"><div class="nl">🔊 PRONUNCIATION</div><div class="nt">${esc(f.pronunciationTip)}</div></div>`:""}
+     ${f.vocab&&f.vocab.length?`<div class="note"><div class="nl">⭐ BETTER VOCABULARY</div><div class="nt">${f.vocab.map(v=>"• "+esc(v)).join("<br>")}</div></div>`:""}
+     ${f.challenge?`<div class="chal"><div class="nl" style="color:#A5B4FC">🎯 CHALLENGE</div><div class="nt" style="color:#F8FAFC">${esc(f.challenge)}</div></div>`:""}
+   </div></div>`;
+}
+function tog(id,btn){
+  const e=document.getElementById(id);if(!e)return;
+  const open=e.style.display==="none";e.style.display=open?"block":"none";
+  if(btn)btn.textContent=open?"ซ่อน Feedback ละเอียด ▲":"ดู Feedback แบบละเอียด ▼";
+}
+
+/* ================= PHRASEBOOK ================= */
+function bm(i){bmText(msgs[i].text,msgs[i].th)}
+function bmText(en,th){
+  book.unshift({en:en,th:th||"",tag:MODULES.find(m=>m.k===mod).n,date:new Date().toLocaleDateString("th-TH")});
+  S("sf-book",book);alert("บันทึกลงคลังประโยคแล้ว 📚");
+}
+function delBm(i){book.splice(i,1);S("sf-book",book);openBook(true)}
+function openBook(re){
+  close_();
+  const list=book.length?book.map((b,i)=>`<div class="item">
+    <div style="font-size:14px;line-height:1.6">${esc(b.en)}</div>
+    ${b.th?`<div style="font-size:12px;color:var(--mut);margin-top:5px">${esc(b.th)}</div>`:""}
+    <div class="row" style="margin-top:9px">
+      <span class="tag">${esc(b.tag)}</span>
+      <span style="font-size:10px;color:var(--mut)">${esc(b.date)}</span>
+      <span style="margin-left:auto">
+        <button class="tool" onclick="speak(book[${i}].en,1)">🔊</button>
+        <button class="tool" onclick="delBm(${i})">🗑</button></span>
+    </div></div>`).join("")
+    :`<div class="empty">ยังไม่มีประโยคที่บันทึกไว้<br>เริ่มบันทึกประโยคที่คุณชอบจากบทเรียนได้เลย</div>`;
+  sheet("📚 คลังประโยค ("+book.length+")",list);
+}
+function openSet(){
+  close_();
+  const opt=(a,v)=>a.map(x=>`<option${x===v?" selected":""}>${x}</option>`).join("");
+  sheet("⚙️ ตั้งค่า",`
+  ${!cfg.key?`<div class="warn">⚠️ ยังไม่ได้ใส่ API Key — ขอฟรีที่ aistudio.google.com แล้ววางด้านล่าง</div>`:""}
+  <label>API Key (เก็บในเครื่องคุณเท่านั้น)</label>
+  <input class="inp" id="f_key" type="password" placeholder="AIza... หรือ gsk_..." value="${esc(cfg.key)}">
+  <label>ผู้ให้บริการ AI</label>
+  <select id="f_provider">
+    <option value="gemini"${cfg.provider==="gemini"?" selected":""}>Google Gemini (แนะนำ)</option>
+    <option value="groq"${cfg.provider==="groq"?" selected":""}>Groq / Llama</option>
+  </select>
+  <label>ชื่อเล่น</label><input class="inp" id="f_name" value="${esc(cfg.name)}">
+  <label>ระดับภาษาอังกฤษ</label><select id="f_level">${opt(LEVELS,cfg.level)}</select>
+  <label>เป้าหมายหลัก</label><input class="inp" id="f_goal" value="${esc(cfg.goal)}">
+  <label>สายการบินเป้าหมาย</label><select id="f_airline">${opt(AIRLINES,cfg.airline)}</select>
+  <label>สไตล์การแก้</label><select id="f_correction">${opt(CORR,cfg.correction)}</select>
+  <label>สำเนียง</label><select id="f_accent">
+    <option value="american"${cfg.accent==="american"?" selected":""}>American</option>
+    <option value="british"${cfg.accent==="british"?" selected":""}>British</option></select>
+  <button class="save" onclick="saveSet()">บันทึก</button>`);
+}
+function saveSet(){
+  ["key","provider","name","level","goal","airline","correction","accent"]
+    .forEach(k=>cfg[k]=document.getElementById("f_"+k).value);
+  S("sf-set",cfg);close_();
+  document.getElementById("greet").textContent="สวัสดี "+(cfg.name||"")+" 👋 พร้อมฝึกวันนี้ไหม?";
+  renderChat();
+}
+function sheet(title,body){
+  const d=document.createElement("div");d.className="ov";d.id="ov";
+  d.onclick=e=>{if(e.target===d)close_()};
+  d.innerHTML=`<div class="sheet rise"><div class="sh"><h3>${title}</h3>
+    <button class="ib" onclick="close_()">✕</button></div>${body}</div>`;
+  document.body.appendChild(d);
+}
+function close_(){const o=document.getElementById("ov");if(o)o.remove()}
+</script>
+</body>
+</html>
