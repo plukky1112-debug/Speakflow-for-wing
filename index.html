@@ -3,65 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0">
-<title>SpeakFlow AI Pro</title>
+<title>SpeakFlow AI</title>
 <style>
-:root{--main:#6366f1;--bg:#0f172a;--card:#1e293b;--text:#f8fafc;}
-body{background:var(--bg);color:var(--text);font-family:system-ui;margin:0;height:100dvh;display:flex;flex-direction:column;}
-.top-bar{padding:15px;background:var(--card);display:flex;justify-content:space-between;align-items:center;}
-.modes{display:flex;overflow-x:auto;padding:10px;gap:10px;background:var(--card);}
-.mode-btn{padding:8px 15px;border-radius:20px;border:1px solid var(--main);background:transparent;color:white;white-space:nowrap;}
-#chat-box{flex:1;overflow-y:auto;padding:15px;}
-.mic-zone{padding:30px;text-align:center;background:var(--card);}
-.mic-btn{width:80px;height:80px;border-radius:50%;background:linear-gradient(45deg,#6366f1,#a855f7);margin:0 auto 15px;display:flex;align-items:center;justify-content:center;font-size:30px;}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;padding:20px;z-index:9999;justify-content:center;}
+body { background: #0f172a; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100dvh; margin: 0; padding: 20px; }
+.msg { padding: 12px; margin: 10px 0; border-radius: 15px; background: #334155; }
+.user { background: #6366f1; align-self: flex-end; }
 </style>
 </head>
 <body>
-
-<div class="top-bar">
-    <div style="font-weight:bold;font-size:1.2rem;">SpeakFlow AI</div>
-    <button onclick="document.getElementById('set-modal').style.display='flex'">⚙️ ตั้งค่า</button>
-</div>
-
-<div class="modes">
-    <button class="mode-btn" onclick="setMode('General')">💬 คุยทั่วไป</button>
-    <button class="mode-btn" onclick="setMode('Interview')">✈️ สัมภาษณ์ลูกเรือ</button>
-    <button class="mode-btn" onclick="setMode('Describe')">🎯 Describe It</button>
-</div>
-
-<div id="chat-box"><div id="log"></div></div>
-
-<div class="mic-zone">
-    <div class="mic" onclick="startRecognition()">🎤</div>
-    <div id="status">แตะไมค์เพื่อฝึกพูด</div>
-</div>
-
-<div id="set-modal" class="modal" style="display:none">
-    <h3>ตั้งค่า API Key</h3>
-    <input id="key-input" type="password" style="padding:15px;border-radius:10px;border:none;">
-    <button onclick="saveKey()" style="margin-top:10px;padding:15px;border-radius:10px;background:var(--main);color:white;border:none;">บันทึก</button>
-    <button onclick="this.parentElement.style.display='none'" style="margin-top:10px;padding:10px;">ปิด</button>
-</div>
+    <div id="log" style="flex:1; overflow-y:auto;"></div>
+    <div onclick="startMic()" style="text-align:center; padding:20px; background:#1e293b; border-radius:20px;">🎤 แตะไมค์พูด</div>
+    <button onclick="setKey()" style="margin-top:10px;">⚙️ ตั้งค่า API Key ใหม่</button>
 
 <script>
-let state = { key: localStorage.getItem('key') || '', mode: 'General' };
-function setMode(m) { state.mode = m; alert("เปลี่ยนโหมดเป็น: " + m); }
-function saveKey() { localStorage.setItem('key', document.getElementById('key-input').value); alert("บันทึกสำเร็จ!"); location.reload(); }
+function setKey(){ 
+    let k = prompt("ใส่ API Key ของคุณ:"); 
+    if(k) { localStorage.setItem('key', k); alert("บันทึกแล้ว"); } 
+}
 
-async function startRecognition() {
-    if(!localStorage.getItem('key')) { document.getElementById('set-modal').style.display = 'flex'; return; }
+async function startMic(){
+    if(!localStorage.getItem('key')) { setKey(); return; }
     const sr = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     sr.onresult = async (e) => {
-        let text = e.results[0][0].transcript;
-        document.getElementById('log').innerHTML += `<div class="msg" style="margin:10px;padding:10px;background:var(--main);border-radius:10px;">You: ${text}</div>`;
+        let txt = e.results[0][0].transcript;
+        document.getElementById('log').innerHTML += `<div class="msg user">${txt}</div>`;
         
-        // ส่งไป Gemini
-        let res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key="+localStorage.getItem('key'), {
-            method: "POST", body: JSON.stringify({contents:[{parts:[{text: `Mode: ${state.mode}. User said: ${text}`}]}]}), headers:{"Content-Type":"application/json"}
-        });
-        let data = await res.json();
-        let reply = data.candidates[0].content.parts[0].text;
-        document.getElementById('log').innerHTML += `<div class="msg" style="margin:10px;padding:10px;background:var(--card);border-radius:10px;">AI: ${reply}</div>`;
+        try {
+            let res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+localStorage.getItem('key'), {
+                method: "POST", headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({contents:[{parts:[{text: "You are an English coach. Respond in one sentence: " + txt}]}]})
+            });
+            let data = await res.json();
+            let reply = data.candidates[0].content.parts[0].text;
+            document.getElementById('log').innerHTML += `<div class="msg">${reply}</div>`;
+        } catch(err) { alert("เชื่อมต่อไม่ได้: " + err); }
     };
     sr.start();
 }
